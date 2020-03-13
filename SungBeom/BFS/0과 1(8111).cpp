@@ -1,36 +1,44 @@
-#include <cstdio>
+#include <iostream>
+#include <string>
 #include <queue>
+#include <set>
 using namespace std;
 
 int main(void)
 {
 	int T;
-	scanf("%d", &T);
+	cin >> T;
 
 	while (T--)
 	{
 		int N;
-		scanf("%d", &N);
+		cin >> N;
 
 		queue<int> q;
-		queue<long long> real;
-		q.push(1 % N); real.push(1);
-		long long ans;
+		queue<string> real;
+		set<int> remains;
+		q.push(1 % N); real.push("1");
+		remains.insert(1);
+
+		string ans = "";
 		while (!q.empty())
 		{
-			int next = q.front(); q.pop();
-			int realNext = real.front(); real.pop();
-			if (next % N == 0)
+			int current = q.front(); q.pop();
+			string realCurrent = real.front(); real.pop();
+			if (current % N == 0)
 			{
-				ans = realNext;
+				ans = realCurrent;
 				break;
 			}
 
-			q.push(next * 10 % N); real.push(realNext * 10);
-			q.push((next * 10 + 1) % N); real.push(realNext * 10 + 1);
+			int next = current * 10 % N;
+			if (remains.insert(next).second) { q.push(next); real.push(realCurrent + "0"); }
+			next = (current * 10 + 1) % N;
+			if (remains.insert(next).second) { q.push(next); real.push(realCurrent + "1"); }
 		}
 
-		printf("%lld\n", ans);
+		if (ans == "") cout << "BRAK\n";
+		else cout << ans << '\n';
 	}
 
 	return 0;
