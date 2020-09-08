@@ -1,4 +1,4 @@
-#include <cstdio>
+#include <iostream>
 #include <queue>
 #include <string>
 
@@ -8,118 +8,119 @@ char map[102][102];
 bool check[102][102];
 bool key[26];
 
-int h, w;
+int h, w, answer;
 
-int dx[] = { 0, 0, -1, 1 };
-int dy[] = { 1, -1, 0, 0 };
+int dx[] = {0, 0, -1, 1};
+int dy[] = {1, -1, 0, 0};
 
 bool InRange(int x, int y)
 {
-	return x >= 0 && x <= h + 1 && y >= 0 && y <= w + 1;
+    return x >= 0 && x <= h + 1 && y >= 0 && y <= w + 1;
 }
 
 int main(void)
 {
-	int a;
-	scanf("%d", &a);
+    int a;
+    cin >> a;
 
-	while (a--)
-	{
-		int answer = 0;
+    while (a--)
+    {
+        int answer = 0;
+        cin >> h >> w;
 
-		scanf("%d %d", &h, &w);
+        for(int i = 0; i < 26; i++)
+        {
+            key[i] = false;
+        }
 
-		for (int i = 0; i <= h + 1; i++)
-		{
-			for (int j = 0; j <= w + 1; j++)
-			{
-				map[i][j] = '.';
-			}
-		}
+        for (int i = 0; i <= 101; i++)
+        {
+            for (int j = 0; j <= 101; j++)
+            {
+                map[i][j] = '.';
+                check[i][j] = false;
+            }
+        }
 
-		for (int i = 1; i <= h; i++)
-		{
-			for (int j = 1; j <= w; j++)
-			{
-				scanf(" %1c", &map[i][j]);
-			}
-		}
-		string alphabet;
-		scanf("%s", &alphabet);
+        for (int i = 1; i <= h; i++)
+        {
+            for(int j = 1; j <= w; j++)
+            {
+                cin >> map[i][j];
+            }
+        }
 
-		for (int i = 0; i < alphabet.size(); i++)
-		{
-			if (alphabet[i] >= 'a' && alphabet[i] <= 'z')
-			{
-				key[alphabet[i] - 'a'] = true;
-			}
-		}
+        string alphabet;
+        cin >> alphabet;
 
-		queue<pair<int, int>> q;
-		queue<pair<int, int>> door[26];
-		q.push(make_pair(0, 0));
-		check[0][0] = true;
+        for (int i = 0; i < alphabet.size(); i++)
+        {
+            if (alphabet[i] >= 'a' && alphabet[i] <= 'z')
+            {
+                key[alphabet[i] - 'a'] = true;
+            }
+        }
 
-		while (!q.empty())
-		{
-			int x = q.front().first;
-			int y = q.front().second;
-			q.pop();
+        queue<pair<int, int>> q;
+        queue<pair<int, int>> door[26];
+        q.push(make_pair(0, 0));
+        check[0][0] = true;
 
-			for (int i = 0; i < 4; i++)
-			{
-				int nx = x + dx[i];
-				int ny = y + dy[i];
+        while (!q.empty())
+        {
+            int x = q.front().first;
+            int y = q.front().second;
+            q.pop();
 
-				if (InRange(nx, ny) && !check[nx][ny])
-				{
-					check[nx][ny] = true;
-					int temp = map[nx][ny] - 'a';
-					int tempA = map[nx][ny] - 'A';
+            for (int i = 0; i < 4; i++)
+            {
+                int nx = x + dx[i];
+                int ny = y + dy[i];
 
-					if (map[nx][ny] == '.')
-					{
-						q.push(make_pair(nx, ny));
-					}
-					else if (map[nx][ny] >= 'A' && map[nx][ny] <= 'Z')
-					{
-						if (key[tempA])
-						{
-							q.push(make_pair(nx, ny));
-						}
-						else
-						{
-							door[tempA].push(make_pair(nx, ny));
-						}
-					}
-					else if (map[nx][ny] >= 'a' && map[nx][ny] <= 'z')
-					{
-						q.push(make_pair(nx, ny));
+                if (InRange(nx, ny) && !check[nx][ny])
+                {
+                    check[nx][ny] = true;
 
-						if (!key[temp])
-						{
-							key[temp] = true;
+                    if (map[nx][ny] == '.')
+                    {
+                        q.push(make_pair(nx, ny));
+                    }
+                    else if (map[nx][ny] >= 'a' && map[nx][ny] <= 'z')
+                    {
+                        q.push(make_pair(nx, ny));
 
-							while (!door[temp].empty())
-							{
-								q.push(door[temp].front());
-								door[temp].pop();
-							}
-						}
-					}
-					else
-					{
-						if (map[nx][ny] == '$')
-						{
-							q.push(make_pair(nx, ny));
-							answer++;
-						}
-					}
-				}
-			}
-		}
-		printf("%d", answer);
-	}
+                        if (!key[map[nx][ny] - 'a'])
+                        {
+                            key[map[nx][ny] - 'a'] = true;
 
-	return 0;
+                            while (!door[map[nx][ny] - 'a'].empty())
+                            {
+                                q.push(door[map[nx][ny] - 'a'].front());
+                                door[map[nx][ny] - 'a'].pop();
+                            }
+                        }
+                    }
+                    else if (map[nx][ny] >= 'A' && map[nx][ny] <= 'Z')
+                    {
+                        if (key[map[nx][ny] - 'A'])
+                        {
+                            q.push(make_pair(nx, ny));
+                        }
+                        else
+                        {
+                            door[map[nx][ny] - 'A'].push(make_pair(nx, ny));
+                        }
+                    }
+                    else if (map[nx][ny] == '$')
+                    {
+                        q.push(make_pair(nx, ny));
+                        answer++;
+                    }
+                }
+            }
+        }
+        cout << answer << "\n";
+    }
+
+    return 0;
 }
